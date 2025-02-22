@@ -42,15 +42,8 @@ namespace HomeWork26
         {
             foreach (var file in dirInfo.GetFiles())
             {
-                var fs = file.AppendText();
-                try
-                {
-                    fs.Write($"РуТест-{file.Name} {DateTime.Now}");
-                }
-                finally
-                {
-                    fs.Close();
-                }
+                using var fs = file.AppendText();
+                fs.Write($"РуТест-{file.Name} {DateTime.Now}");
             }
         }
 
