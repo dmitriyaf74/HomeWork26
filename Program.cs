@@ -58,8 +58,8 @@ namespace HomeWork26
         {
             var baseDir = @"c:\\Otus\\TestDir";
             //1. Создать директории c:\Otus\TestDir1 и c:\Otus\TestDir2 с помощью класса DirectoryInfo.
-            var dirInfo1 = directoryInfo(@$"{BaseDir}1");
-            var dirInfo2 = directoryInfo(@$"{BaseDir}2");
+            var dirInfo1 = directoryInfo(@$"{baseDir}1");
+            var dirInfo2 = directoryInfo(@$"{baseDir}2");
             //2. В каждой директории создать несколько файлов File1...File10 с помощью класса File.
             CreateTenFiles(dirInfo1);
             CreateTenFiles(dirInfo2);
