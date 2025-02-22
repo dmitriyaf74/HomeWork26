@@ -20,7 +20,7 @@ namespace HomeWork26
         {
             for (int i = 0; i < 10; i++)
             {
-                var filePath = $"{dirInfo.FullName}\\File{i}";
+                var filePath = Path.Combine(dirInfo.FullName, $"File{i}");
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
