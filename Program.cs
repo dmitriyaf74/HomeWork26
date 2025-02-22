@@ -56,7 +56,7 @@ namespace HomeWork26
 
         static void Main(string[] args)
         {
-            var BaseDir = @"c:\\Otus\\TestDir";
+            var baseDir = @"c:\\Otus\\TestDir";
             //1. Создать директории c:\Otus\TestDir1 и c:\Otus\TestDir2 с помощью класса DirectoryInfo.
             var dirInfo1 = directoryInfo(@$"{BaseDir}1");
             var dirInfo2 = directoryInfo(@$"{BaseDir}2");
