@@ -1,6 +1,9 @@
 ﻿using System.IO;
 using System.IO.Enumeration;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
+
 namespace HomeWork26
 {
     internal class Program
@@ -23,9 +26,10 @@ namespace HomeWork26
                 var filePath = Path.Combine(dirInfo.FullName, $"File{i}");
                 if (File.Exists(filePath))
                 {
+                    //FileSecurity fileSecurity = System.Security.AccessControl.(filePath);
                     File.Delete(filePath);
                 }
-                File.Create(filePath).Close();
+                using var fs = File.CreateText(filePath);
             }
 
         }
@@ -38,12 +42,63 @@ namespace HomeWork26
             }
         }
 
+
+        static bool CheckGrantOnWrite(string FileName) 
+        {
+            try
+            {
+                FileInfo fInfo = new FileInfo(FileName);
+
+                FileSecurity fileSecurity = fInfo.GetAccessControl();
+                AuthorizationRuleCollection rules = fileSecurity.GetAccessRules(true, true, typeof(NTAccount));
+                WindowsIdentity currentUser = WindowsIdentity.GetCurrent();
+                foreach (FileSystemAccessRule rule in rules) 
+                {
+                    if ((FileSystemRights.Write & rule.FileSystemRights) == FileSystemRights.Write)
+                    { 
+                        return true;
+                    }
+                }
+                return false;
+            }
+            catch 
+            {
+                return false;
+            }
+        }
+
         static void ScanDirAndWriteFileName(DirectoryInfo dirInfo)
         {
             foreach (var file in dirInfo.GetFiles())
             {
-                using var fs = file.AppendText();
-                fs.Write($"РуТест-{file.Name} {DateTime.Now}");
+                if (file.Exists)
+                {
+                    if (CheckGrantOnWrite(file.FullName))
+                    {
+                        using (var stream = new FileStream(file.FullName, FileMode.Open))
+                        {
+                            using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                            {
+                                writer.Write($"{file.Name}");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        static void ScanDirAndWriteFileNow(DirectoryInfo dirInfo)
+        {
+            foreach (var file in dirInfo.GetFiles())
+            {
+                using (var stream = new FileStream(file.FullName, FileMode.Open))
+                {
+                    stream.Seek(0, SeekOrigin.End);
+                    using (var writer = new StreamWriter(stream, Encoding.UTF8))
+                    {
+                        writer.Write($" {DateTime.Now}");
+                    }
+                }
             }
         }
 
@@ -58,9 +113,11 @@ namespace HomeWork26
             CreateTenFiles(dirInfo2);
             //3. В каждый файл записать его имя в кодировке UTF8. Учесть, что файл может быть удален, либо отсутствовать права на запись.
             //UTF-8 - default
-            //4. Каждый файл дополнить текущей датой(значение DateTime.Now) любыми способами: синхронно и\или асинхронно.
             ScanDirAndWriteFileName(dirInfo1);
             ScanDirAndWriteFileName(dirInfo2);
+            //4. Каждый файл дополнить текущей датой(значение DateTime.Now) любыми способами: синхронно и\или асинхронно.
+            ScanDirAndWriteFileNow(dirInfo1);
+            ScanDirAndWriteFileNow(dirInfo2);
             //5. Прочитать все файлы и вывести на консоль: имя_файла: текст + дополнение.
             ScanDirAndRead(dirInfo1);
             ScanDirAndRead(dirInfo2);
